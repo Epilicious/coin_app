@@ -1,9 +1,17 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
+import { BrowserRouter } from "react-router-dom";
+import SampleLayout from "./components/SampleLayout";
+import Routes from "./components/Routes";
 
 function App() {
-  return <div className="App"></div>;
+  return (
+    <BrowserRouter>
+      <SampleLayout>
+        <Routes />
+      </SampleLayout>
+    </BrowserRouter>
+  );
 }
 
 export default App;
