@@ -1,5 +1,5 @@
 import { Line } from "@ant-design/charts";
-import { Col, Row, Space, Spin } from "antd";
+import { Button, Col, Input, Row, Space, Spin } from "antd";
 import { format } from "date-fns";
 import React, { ReactElement, useRef } from "react";
 import { useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import useCoinApi from "../shared/useCoinApi";
 import { CoinDetail } from "../types/CoinDetail";
 import CoinHistory from "../types/CoinHistory";
 import { Radio, RadioChangeEvent } from "antd";
+import colorPercent from "../shared/colorPercent";
 
 function CoinDetails(): ReactElement {
   const { id } = useParams<{ id: string }>();
@@ -20,13 +21,20 @@ function CoinDetails(): ReactElement {
   if (!coin) return <Spin />;
   if (!coinHistory) return <Spin />;
 
-  const handleSizeChange = (e: RadioChangeEvent) => {
+  console.log(coin);
+
+  const handleTimeChange = (e: RadioChangeEvent) => {
     setTime(e.target.value);
   };
 
   const data = coinHistory.prices.map((history) => {
+    const price = new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+    }).format(history[1]);
+
     if (time === "1") {
-      const date = `${format(new Date(history[0]), "kk:mm")}`;
+      const date = `${format(new Date(history[0]), "dd.LL kk:mm")}`;
       return { date, value: Number(history[1].toFixed(2)) };
     }
     if (time === "7" || "14") {
@@ -36,7 +44,13 @@ function CoinDetails(): ReactElement {
     return {};
   });
 
+  const formattedPrice = new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(coin.market_data.current_price.eur);
+
   console.log(data);
+
   const config = {
     data,
     height: 300,
@@ -73,9 +87,10 @@ function CoinDetails(): ReactElement {
           ></span>
         </Col>
       </Row>
+
       <Row>
         <Col>
-          <Radio.Group value={time} onChange={handleSizeChange}>
+          <Radio.Group value={time} onChange={handleTimeChange}>
             <Radio.Button value="1">24h </Radio.Button>
             <Radio.Button value="7">7d</Radio.Button>
             <Radio.Button value="14">14d</Radio.Button>
@@ -85,6 +100,12 @@ function CoinDetails(): ReactElement {
       <Row>
         <Col span={12}>
           <Line {...config} />
+        </Col>
+        <Col>
+          <h1>{formattedPrice}</h1>
+          <span>
+            {colorPercent(coin.market_data.price_change_percentage_24h)}
+          </span>
         </Col>
       </Row>
     </div>
