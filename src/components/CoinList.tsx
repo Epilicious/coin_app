@@ -13,6 +13,8 @@ import {
   ColumnType,
   FilterConfirmProps,
 } from "antd/lib/table/interface";
+import { Store, useStore } from "../Store";
+import FavoriteBtn from "./FavoriteBtn";
 
 export interface FilterDropdownProps {
   prefixCls: string;
@@ -32,6 +34,7 @@ function CoinList(): ReactElement {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+  const { store, dispatch } = useStore();
 
   if (!coins) {
     return <Spin />;
@@ -171,12 +174,22 @@ function CoinList(): ReactElement {
         }).format(price);
         return value;
       },
+      sorter: (a, b) => a.current_price - b.current_price,
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "24h",
       dataIndex: "price_change_percentage_24h",
       key: "price_change_percentage_24h",
+
       render: (change: number) => colorPercent(change),
+    },
+    {
+      title: "",
+      key: "id",
+      render: (id: string, record: Coin.RootObject) => (
+        <FavoriteBtn coin={record} />
+      ),
     },
   ];
 
